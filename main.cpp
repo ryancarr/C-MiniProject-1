@@ -13,7 +13,7 @@ using std::abs;
 using std::pow;
 using std::sqrt;
 
-enum class State {kEmpty, kObstacle};
+enum class State {kEmpty, kObstacle, kClosed};
 
 
 vector<State> ParseLine(string line) {
@@ -54,6 +54,13 @@ float Heuristic(vector<int> origin, vector<int> goal)
 {
   return sqrt(pow(goal[0] - origin[0], 2) + 
               pow(goal[1] - origin[1], 2));
+}
+
+void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vector<State>> &board)
+{
+  vector<int> node = {x, y, g, h};
+  open.push_back(node);
+  board[x][y] = State::kClosed;
 }
 
 /** 
