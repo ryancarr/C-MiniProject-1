@@ -56,6 +56,13 @@ float Heuristic(vector<int> origin, vector<int> goal)
               pow(goal[1] - origin[1], 2));
 }
 
+bool Compare(vector<int> firstNode, vector<int> secondNode)
+{
+  float firstF  = firstNode[2] + firstNode[3];
+  float secondF = secondNode[2] + secondNode[3];
+  return firstF > secondF;
+}
+
 void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vector<State>> &board)
 {
   vector<int> node = {x, y, g, h};
@@ -66,8 +73,13 @@ void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vec
 /** 
  * Implementation of A* search algorithm
  */
-vector<vector<State>> Search(vector<vector<State>> board, vector<int> init, vector<int> goal)
+vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[2])
 {
+  vector<vector<int>> open{};
+  int g = 0;
+
+  AddToOpen(init[0], init[1], g, Heuristic(init[0], init[1], goal[0], goal[1]), open, board);
+
   cout << "No path found!" << std::endl;
   return vector<vector<State>>{};
 }
@@ -92,8 +104,8 @@ void PrintBoard(const vector<vector<State>> board) {
 
 
 int main() {
-  vector<int> init {0, 0};
-  vector<int> goal {4, 5};
+  int init[2] {0, 0};
+  int goal[2] {4, 5};
   auto board = ReadBoardFile("1.board");
   auto solution = Search(board, init, goal);
   PrintBoard(solution);
