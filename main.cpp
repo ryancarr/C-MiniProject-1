@@ -1,19 +1,21 @@
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <cmath>
+using std::abs;
 using std::cout;
 using std::ifstream;
 using std::istringstream;
+using std::pow;
+using std::sort;
+using std::sqrt;
 using std::string;
 using std::vector;
-using std::abs;
-using std::pow;
-using std::sqrt;
 
-enum class State {kEmpty, kObstacle, kClosed};
+enum class State {kEmpty, kObstacle, kClosed, kPath};
 
 
 vector<State> ParseLine(string line) {
@@ -77,7 +79,6 @@ vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[
 {
   vector<vector<int>> open{};
   int g = 0;
-
   AddToOpen(init[0], init[1], g, Heuristic(init[0], init[1], goal[0], goal[1]), open, board);
 
   cout << "No path found!" << std::endl;
