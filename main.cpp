@@ -16,7 +16,7 @@ using std::string;
 using std::vector;
 
 // Possible node states
-enum class State {kEmpty, kObstacle, kClosed, kPath};
+enum class State {kClosed, kEmpty, kFinish, kObstacle, kPath, kStart};
 
 // directional deltas
 const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
@@ -141,14 +141,18 @@ vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[
     board[x][y] = State::kPath;
 
     if(x == goal[0] && y == goal[1])
+    {
+      board[init[0]][init[1]] = State::kStart;
+      board[goal[0]][goal[1]] = State::kFinish;
       return board;
+    }
     else
       ExpandNeighbors(current, goal, open, board);
   
   }
 
-  cout << "No path found!" << std::endl;
-  return vector<vector<State>>{};
+  cout << "No path found!" << '\n';
+  return board;
 }
 
 
@@ -157,6 +161,8 @@ string CellString(State cell)
   switch(cell) {
     case State::kObstacle: return "⛰️   ";
     case State::kPath: return "🚗   ";
+    case State::kStart: return "🚦   ";
+    case State::kFinish: return "🏁   ";
     default: return "0   "; 
   }
 }
