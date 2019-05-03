@@ -15,7 +15,12 @@ using std::sqrt;
 using std::string;
 using std::vector;
 
+// Possible node states
 enum class State {kEmpty, kObstacle, kClosed, kPath};
+
+// directional deltas
+const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+
 
 
 vector<State> ParseLine(string line) {
@@ -80,6 +85,39 @@ void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vec
   board[x][y] = State::kClosed;
 }
 
+bool CheckValidCell(int x, int y, const vector<vector<State>> board)
+{
+  // TODO: Check out of bound conditions x or y < 0 or x or y > size()
+  if((x >= 0 && x < board.size()) &&
+     (y >= 0 && y < board[0].size()))
+    return board[x][y] == State::kEmpty;
+  else
+    return false;
+}
+
+/** 
+ * Expand current nodes's neighbors and add them to the open list.
+ */
+void ExpandNeighbors(vector<int> &current, int goal[2], vector<vector<int>> &open, vector<vector<State>> &board)
+{
+  int x = current[0];
+  int y = current[1];
+  int g = current[2];
+
+  for(int i = 0; i < 4; i++)
+  {
+    int neighborX = x + delta[i][0];
+    int neighborY = y + delta[i][1];
+  
+    if(CheckValidCell(neighborX, neighborY, board))
+    {
+      int g2 = g + 1;
+      int h = Heuristic(neighborX, neighborY, goal[0], goal[1]);
+      AddToOpen(neighborX, neighborY, g2, h, open, board);
+    }
+  }  
+}
+
 /** 
  * Implementation of A* search algorithm
  */
@@ -104,10 +142,8 @@ vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[
 
     if(x == goal[0] && y == goal[1])
       return board;
-
-    
-    // If we're not done, expand search to current node's neighbors. This step will be completed in a later quiz.
-    // ExpandNeighbors
+    else
+      ExpandNeighbors(current, goal, open, board);
   
   }
 
@@ -116,7 +152,8 @@ vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[
 }
 
 
-string CellString(State cell) {
+string CellString(State cell)
+{
   switch(cell) {
     case State::kObstacle: return "⛰️   ";
     case State::kPath: return "🚗   ";
@@ -125,7 +162,8 @@ string CellString(State cell) {
 }
 
 
-void PrintBoard(const vector<vector<State>> board) {
+void PrintBoard(const vector<vector<State>> board)
+{
   for (int i = 0; i < board.size(); i++) {
     for (int j = 0; j < board[i].size(); j++) {
       cout << CellString(board[i][j]);
@@ -135,9 +173,10 @@ void PrintBoard(const vector<vector<State>> board) {
 }
 
 
-int main() {
-  int init[2] {0, 0};
-  int goal[2] {4, 5};
+int main()
+{
+  int init[2]{0, 0};
+  int goal[2]{4, 5};
   auto board = ReadBoardFile("1.board");
   auto solution = Search(board, init, goal);
   PrintBoard(solution);
