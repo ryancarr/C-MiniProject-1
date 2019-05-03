@@ -58,11 +58,19 @@ float Heuristic(vector<int> origin, vector<int> goal)
               pow(goal[1] - origin[1], 2));
 }
 
-bool Compare(vector<int> firstNode, vector<int> secondNode)
+bool Compare(const vector<int> firstNode, const vector<int> secondNode)
 {
   float firstF  = firstNode[2] + firstNode[3];
   float secondF = secondNode[2] + secondNode[3];
   return firstF > secondF;
+}
+
+/**
+ * Sort the two-dimensional vector of ints in descending order.
+ */
+void CellSort(vector<vector<int>> *v) 
+{
+  sort(v->begin(), v->end(), Compare);
 }
 
 void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vector<State>> &board)
@@ -78,8 +86,30 @@ void AddToOpen(int x, int y, int g, int h, vector<vector<int>> &open, vector<vec
 vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[2])
 {
   vector<vector<int>> open{};
+  int x = init[0];
+  int y = init[1];
   int g = 0;
-  AddToOpen(init[0], init[1], g, Heuristic(init[0], init[1], goal[0], goal[1]), open, board);
+  int h = Heuristic(init[0], init[1], goal[0], goal[1]);
+  AddToOpen(x, y, g, h, open, board);
+
+  while(open.size() > 0)
+  {
+    CellSort(&open);
+
+    auto current = open.back();
+    open.pop_back();
+    x = current[0];
+    y = current[1];
+    board[x][y] = State::kPath;
+
+    if(x == goal[0] && y == goal[1])
+      return board;
+
+    
+    // If we're not done, expand search to current node's neighbors. This step will be completed in a later quiz.
+    // ExpandNeighbors
+  
+  }
 
   cout << "No path found!" << std::endl;
   return vector<vector<State>>{};
@@ -89,6 +119,7 @@ vector<vector<State>> Search(vector<vector<State>> board, int init[2], int goal[
 string CellString(State cell) {
   switch(cell) {
     case State::kObstacle: return "⛰️   ";
+    case State::kPath: return "🚗   ";
     default: return "0   "; 
   }
 }
